@@ -6,12 +6,6 @@ def github() -> str:
 
     return "https://github.com/zixuan28/ECON481_HWs/blob/main/481HW1.py"
 
-#Ex 1:
-pip3 install numpy
-pip3 install pandas
-pip3 install scipy
-pip3 install seaborn
-
 #Ex 2:
 def evens_and_odds(n: int) -> dict:
     """
