@@ -15,7 +15,8 @@ def simulate_data(seed: int = 481 ) -> tuple:
     First, I draw 3000 numbers from normal distribution with mean 0 and variance 2.
     Then, I reshape the samples to a 1000 by 3 matrix.
     Second, I draw 1000 numbers from the standard normal distribution.
-    Last, I use the formula provided and reshape it to a 1000 by 1 matrix.
+    Third, I made a 1000 by 1 matrix with only 5s.
+    Last, I add up all the variables with the provided formula.
     """
     rng = np.random.default_rng(481)
     X = rng.normal(0, np.sqrt(2), 3000).reshape(-1, 3)
