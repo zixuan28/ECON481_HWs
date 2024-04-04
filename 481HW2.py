@@ -17,9 +17,10 @@ def simulate_data(seed: int = 481 ) -> tuple:
     Second, I draw 1000 numbers from the standard normal distribution.
     Last, I use the formula provided and reshape it to a 1000 by 1 matrix.
     """
-    rng = np.random.default_rng(seed)
+    rng = np.random.default_rng(481)
     X = rng.normal(0, np.sqrt(2), 3000).reshape(-1, 3)
-    Epsi = rng.standard_normal(1000)
-    y = (5 + 3*X[:,0] + 2*X[:,1] + 6*X[:,2] + Epsi).reshape(-1, 1)
+    Epsi = rng.standard_normal(1000).reshape(-1,1)
+    Five = (np.ones(1000) * 5).reshape(-1,1)
+    y = Five + 3*X[:,0:1] + 2*X[:,1:2] + 6*X[:,2:3] + Epsi
 
     return (y, X)
