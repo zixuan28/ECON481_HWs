@@ -39,7 +39,7 @@ def estimate_mle(y: np.array, X: np.array) -> np.array:
     x_0 = np.zeros(X.shape[1]+1)
     X_int = np.c_[np.ones(X.shape[0]).reshape(-1,1), X]
     
-    def MLE(beta: np.array, y: np.array, X: np.array) -> np.array:
+    def MLE(beta: np.array, y: np.array, X: np.array) -> float:
         y_hat = np.dot(X_int, beta)
         e_hat = y - y_hat
         log_normal = np.log(1 / np.sqrt(2 * np.pi)) - 0.5 * np.square(e_hat)
@@ -68,7 +68,7 @@ def estimate_ols(y: np.array, X: np.array) -> np.array:
     x_0 = np.zeros(X.shape[1]+1)
     X_int = np.c_[np.ones(X.shape[0]).reshape(-1,1), X]
 
-    def OLS(beta: np.array, y: np.array, X: np.array) -> np.array:
+    def OLS(beta: np.array, y: np.array, X: np.array) -> float:
         y_hat = np.dot(X_int, beta)
         e_hat = y - y_hat
         ols_func = np.sum(np.square(e_hat))
