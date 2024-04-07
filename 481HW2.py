@@ -25,3 +25,61 @@ def simulate_data(seed: int = 481 ) -> tuple:
     y = Five + 3*X[:,0:1] + 2*X[:,1:2] + 6*X[:,2:3] + Epsi
 
     return (y, X)
+
+#Ex 2:
+import numpy as np
+import scipy as sp
+
+def estimate_mle(y: np.array, X: np.array) -> np.array:
+    """
+    This code returns to the estimated coefficients of a sample regression.
+    The MLE is the negative log likelihood function for normal distribution.
+    The minimization function takes the MLE and return the estimated coefficients.
+    """
+    x_0 = np.zeros(X.shape[1]+1)
+    X_int = np.c_[np.ones(X.shape[0]).reshape(-1,1), X]
+    
+    def MLE(beta: np.array, y: np.array, X: np.array) -> np.array:
+        y_hat = np.dot(X_int, beta)
+        e_hat = y - y_hat
+        log_normal = np.log(1 / np.sqrt(2 * np.pi)) - 0.5 * np.square(e_hat)
+        
+        return -np.sum(log_normal)
+
+    result = sp.optimize.minimize(
+        fun = MLE, 
+        x0 = x_0, 
+        args = (y.reshape(1, -1), X_int),
+        method='Nelder-Mead'
+    )
+    
+    return result.x.reshape(-1,1)
+
+#Ex 3:
+import numpy as np
+import scipy as sp
+
+def estimate_ols(y: np.array, X: np.array) -> np.array:
+    """
+    This code returns to the estiamted coefficients of a sample regression.
+    The OLS is the sum of residual squares.
+    The minimization functions performs the OLS method and returns beta hats.
+    """
+    x_0 = np.zeros(X.shape[1]+1)
+    X_int = np.c_[np.ones(X.shape[0]).reshape(-1,1), X]
+
+    def OLS(beta: np.array, y: np.array, X: np.array) -> np.array:
+        y_hat = np.dot(X_int, beta)
+        e_hat = y - y_hat
+        ols_func = np.sum(np.square(e_hat))
+        
+        return ols_func
+
+    result = sp.optimize.minimize(
+        fun = OLS, 
+        x0 = x_0, 
+        args = (y.reshape(1, -1), X_int),
+        method='Nelder-Mead'
+    )
+
+    return result.x.reshape(-1,1)
