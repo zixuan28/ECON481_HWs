@@ -1,5 +1,3 @@
-import pandas as pd
-
 #Ex 0:
 def github() -> str:
     """
@@ -9,6 +7,8 @@ def github() -> str:
     return "https://github.com/zixuan28/ECON481_HWs/blob/main/481HW3.py"
 
 #Ex 1:
+import pandas as pd
+
 def import_yearly_data(years: list) -> pd.DataFrame:
     '''
     This function takes a list of years and returns a dataframe with the data from the years in the list.
@@ -26,5 +26,22 @@ def import_yearly_data(years: list) -> pd.DataFrame:
     ]
 
     concat_data = pd.concat(data_frames, ignore_index = True) #concatenating the dataframes without the original indices from the sets
+    
+    return concat_data
+
+#Ex 2:
+import pandas as pd
+import pyxlsb as px
+
+def import_parent_companies(years: list) -> pd.DataFrame:
+    url_parent = "https://lukashager.netlify.app/econ-481/data/ghgp_data_parent_company_09_2023.xlsb"
+    
+    dfs = [
+        pd.read_excel(url_parent, sheet_name=str(year)).assign(year=year)
+        for year in years
+    ]
+    
+    concat_data = pd.concat(dfs, ignore_index=True)
+    concat_data.dropna(how='all', inplace=True)
     
     return concat_data
