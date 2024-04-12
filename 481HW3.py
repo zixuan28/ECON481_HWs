@@ -12,6 +12,9 @@ import pandas as pd
 def import_yearly_data(years: list) -> pd.DataFrame:
     '''
     This function takes a list of years and returns a dataframe with the data from the years in the list.
+    The function first take all the years in the list and check if the year is in the links dictionary.
+    If the year is in the links dictionary, the function reads the data from the link and assigns the year to the data.
+    The function then concatenates the dataframes without the original indices from the sets.
     '''
     links = {
         2022: "https://lukashager.netlify.app/econ-481/data/ghgp_data_2022.xlsx",
@@ -31,9 +34,13 @@ def import_yearly_data(years: list) -> pd.DataFrame:
 
 #Ex 2:
 import pandas as pd
-import pyxlsb as px
 
 def import_parent_companies(years: list) -> pd.DataFrame:
+    '''
+    This function takes a list of years and returns a dataframe with the data from the years in the list.
+    The function first takes all the years in the list and reads the data from the link with the year in the link.
+    The function then concatenates the dataframes without the original indices from the sets.
+    '''
     url_parent = "https://lukashager.netlify.app/econ-481/data/ghgp_data_parent_company_09_2023.xlsb"
     
     dfs = [
