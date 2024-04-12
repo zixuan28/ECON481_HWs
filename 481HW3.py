@@ -52,3 +52,39 @@ def import_parent_companies(years: list) -> pd.DataFrame:
     concat_data.dropna(how='all', inplace=True)
     
     return concat_data
+
+#Ex 3:
+def n_null(df: pd.DataFrame, col: str) -> int:
+    """
+    This function takes a dataframe and a column name and returns the number of missing values in the column.
+    """
+
+    return pd.isnull(df[col]).sum()
+
+#Ex 4:
+import pandas as pd
+
+def clean_data(emissions_data: pd.DataFrame, parent_data: pd.DataFrame) -> pd.DataFrame:
+    """
+    This function takes two dataframes and returns a cleaned dataframe.
+    The function first renames the columns of the dataframes to make the merging easier.
+    The function then merges the dataframes on the year and Facility ID columns.
+    The function then selects the columns that we want to keep in the final dataframe.
+    The function then renames the columns to lowercase.
+    """
+    parent_data.rename(columns={'GHGRP FACILITY ID': 'Facility ID'}, inplace=True)
+    emissions_data.rename(columns={'Facility Id': 'Facility ID'}, inplace=True)
+    
+    merged_data = pd.merge(parent_data, emissions_data, how='left', on = ['year', 'Facility ID'])
+    
+    final_data = merged_data[
+    [
+    'Facility ID', 'year', 'State', 'Industry Type (sectors)', 'Total reported direct emissions', 
+    'PARENT CO. STATE', 'PARENT CO. PERCENT OWNERSHIP'
+    ]
+    ]
+    
+    final_data.columns = final_data.columns.str.lower()
+    
+    return final_data
+    
