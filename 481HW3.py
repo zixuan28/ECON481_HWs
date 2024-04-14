@@ -87,4 +87,25 @@ def clean_data(emissions_data: pd.DataFrame, parent_data: pd.DataFrame) -> pd.Da
     final_data.columns = final_data.columns.str.lower()
     
     return final_data
+
+#Ex 5:
+#Ex 5:
+import pandas as pd
+
+def aggregate_emissions(df: pd.DataFrame, group_vars: list) -> pd.DataFrame:
+    """
+    This function takes a dataframe and a list of group variables and returns an aggregated dataframe.
+    The function groups the data by the group variables and calculates the minimum, median, mean, and maximum of the total reported direct emissions and parent co. percent ownership.
+    The function then sorts the data by the mean of the total reported direct emissions in descending order.
+    """
+    agg_dict = {
+        'total reported direct emissions': ['min', 'median', 'mean', 'max'],
+        'parent co. percent ownership': ['min', 'median', 'mean', 'max']
+    }
+
+    agg_data = df.groupby(group_vars, as_index=True).agg(agg_dict)
+
+    agg_data.sort_values(by=('total reported direct emissions', 'mean'), ascending=False, inplace=True)
+
+    return agg_data
     
