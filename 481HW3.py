@@ -89,7 +89,6 @@ def clean_data(emissions_data: pd.DataFrame, parent_data: pd.DataFrame) -> pd.Da
     return final_data
 
 #Ex 5:
-#Ex 5:
 import pandas as pd
 
 def aggregate_emissions(df: pd.DataFrame, group_vars: list) -> pd.DataFrame:
