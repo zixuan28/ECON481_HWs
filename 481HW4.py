@@ -57,3 +57,25 @@ def autoregress(df: pd.DataFrame) -> float:
     model3 = sm.OLS(Delta_X, Delta_X_old).fit(cov_type='HC1')
     
     return model3.tvalues[0]
+
+#Ex 4: 
+import pandas as pd
+import statsmodels.api as sm
+import numpy as np
+
+def autoregress_logit(df: pd.DataFrame) -> float:
+    """
+    The function performs data cleaning as #ex 3.
+    The function transforms all values in delta_close into binary values using the sigmoid function.
+    The function then runs a logistic regression of Delta_X on Delta_X_old without an intercept.
+    The function then returns the t-value of the coefficient.
+    """
+    df['delta_close'] = df['Close'].diff()
+    df['delta_close_old'] = df['delta_close'].shift(1)
+    df = df.dropna()
+    Delta_X = df['delta_close']
+    Delta_X = 1 / (1 + np.exp(-Delta_X))
+    Delta_X_old = df['delta_close_old']
+    model4 = sm.Logit(Delta_X, Delta_X_old).fit()
+
+    return model4.tvalues[0]
