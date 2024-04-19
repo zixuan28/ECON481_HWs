@@ -19,6 +19,7 @@ def load_data() -> pd.DataFrame:
 
 #Ex 2:
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def plot_close(df: pd.DataFrame, start: str = '2010-06-29', end: str = '2024-04-15') -> None:
     """
@@ -37,3 +38,22 @@ def plot_close(df: pd.DataFrame, start: str = '2010-06-29', end: str = '2024-04-
     plt.show()
 
 #Ex 3:
+import statsmodels.api as sm
+import pandas as pd
+
+def autoregress(df: pd.DataFrame) -> float:
+    """
+    The function first creates a new column 'delta_close' which is the difference between the closing price of the current day and the previous day.
+    Then, the function creates another column 'delta_close_old' which is the 'delta_close' column shifted up by 1.
+    Then, the function drops all na values.
+    The function then creates two variables Delta_X and Delta_X_old.
+    The function then runs an OLS regression of Delta_X on Delta_X_old without an intercept and uses HC1 hetroscedasticity robust standard errors.
+    """
+    df['delta_close'] = df['Close'].diff()
+    df['delta_close_old'] = df['delta_close'].shift(1)
+    df = df.dropna()
+    Delta_X = df['delta_close']
+    Delta_X_old = df['delta_close_old']
+    model3 = sm.OLS(Delta_X, Delta_X_old).fit(cov_type='HC1')
+    
+    return model3.tvalues[0]
