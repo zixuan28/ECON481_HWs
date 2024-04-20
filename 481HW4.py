@@ -79,3 +79,26 @@ def autoregress_logit(df: pd.DataFrame) -> float:
     model4 = sm.Logit(Delta_X, Delta_X_old).fit()
 
     return model4.tvalues[0]
+
+#Ex 5:
+import matplotlib.pyplot as plt
+import pandas as pd
+
+def plot_delta(df: pd.DataFrame) -> None:
+    """
+    The function first creates a new column recording the closing price difference between two consecutive days.
+    The function then drops all na values.
+    The function then transfer Dates into datetime objects.
+    The function then plots the closing price difference against the date.
+    """
+    df['delta_close'] = df['Close'].diff()
+    df = df.dropna()
+    df['Date'] = pd.to_datetime(df['Date'])
+    Delta_X = df['delta_close']
+    Dates = df['Date']
+    df.set_index('Date', inplace = True)
+    plt.plot(Dates, Delta_X)
+    plt.title('Plot of Change of TSLA Closing Price')
+    plt.xlabel('Dates (Years)')
+    plt.ylabel('Change of Closing Price')
+    plt.show()
