@@ -56,3 +56,82 @@ def std() -> str:
     """
     
     return print(auctions.query(q))
+
+#Ex 2:
+def bidder_spend_frac() -> str:
+    """
+    First, the function find the winning bidder by selecting the longest bidtime for each item.
+    The function then calculates the total number of bids for each bidder.
+    Then, the function calculates the total spend for each bidder.
+    Lastly, the function joins the two parts and calculates the spend fraction for each bidder.
+    """
+    q2 = """
+    WITH Sumbidder AS (
+        SELECT HighbidderName AS bidderName, SUM(bidAmount) AS total_spend
+        FROM (
+            SELECT b1.HighbidderName, b1.bidAmount
+            FROM bids b1
+            JOIN (
+                SELECT itemId, MAX(bidTime) AS latest_timestamp
+                FROM bids
+                GROUP BY itemId
+            ) b2 ON b1.itemId = b2.itemId AND b1.bidTime = b2.latest_timestamp
+        ) latest_bids
+        GROUP BY bidderName
+    ), 
+    TotalBids AS (
+        SELECT bidderName, MAX(bidAmount) AS total_bids
+        FROM bids
+        GROUP BY bidderName
+    )
+    SELECT s.bidderName, s.total_spend, t.total_bids, (s.total_spend / t.total_bids) AS spend_frac
+    FROM Sumbidder s
+    JOIN TotalBids t ON s.bidderName = t.bidderName;
+    """
+    return print(auctions.query(q2))
+
+#Ex 3:
+def min_increment_freq() -> str:
+    """
+    The function first find the frequency with which a bid is placed at the minimum increment for each item.
+    Then, the function check if the new bid amount is bigger than the previous bid amount.
+    If the new bid amount is bigger than the previous bid amount, the function calculates the frequency.
+    """
+    q3 = """
+    SELECT 
+        SUM(CASE 
+                WHEN b2.bidAmount = b1.bidAmount + i.bidIncrement THEN 1
+                ELSE 0
+            END) * 1.0 / COUNT(b2.bidAmount) AS freq
+    FROM bids b1
+    JOIN bids b2 ON b1.itemId = b2.itemId AND b1.bidAmount < b2.bidAmount
+    JOIN items i ON i.itemId = b1.itemId
+    WHERE i.isBuyNowUsed = 0
+    GROUP BY b1.itemId;
+    """
+    return print(auctions.query(q3))
+
+#Ex 4 (Wrong):
+def win_perc_by_timestamp() -> str:
+    """
+    Returns a SQL query that calculates the frequency with which a bid placed with a certain timestamp bin won the auction.
+    """
+    q4 = """
+    WITH BidsWithTimeBin AS (
+        SELECT bidId, itemId, 
+               CAST((julianday(bidTimestamp) - julianday(auctionStart)) / (julianday(auctionEnd) - julianday(auctionStart)) * 10 AS INTEGER) + 1 AS timestamp_bin
+        FROM bids
+        JOIN items ON bids.itemId = items.itemId
+    ), 
+    WinningBids AS (
+        SELECT itemId, MAX(bidId) AS winning_bid
+        FROM bids
+        GROUP BY itemId
+    )
+    SELECT timestamp_bin, COUNT(*) AS total_bids, SUM(CASE WHEN BidsWithTimeBin.bidId = WinningBids.winning_bid THEN 1 ELSE 0 END) AS winning_bids,
+           CAST(SUM(CASE WHEN BidsWithTimeBin.bidId = WinningBids.winning_bid THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) AS win_perc
+    FROM BidsWithTimeBin
+    LEFT JOIN WinningBids ON BidsWithTimeBin.itemId = WinningBids.itemId
+    GROUP BY timestamp_bin;
+    """
+    return print(auctions.query(q4))
