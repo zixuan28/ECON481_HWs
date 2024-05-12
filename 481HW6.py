@@ -111,27 +111,50 @@ def min_increment_freq() -> str:
     """
     return print(auctions.query(q3))
 
-#Ex 4 (Wrong):
+#Ex 4:
+
 def win_perc_by_timestamp() -> str:
     """
-    Returns a SQL query that calculates the frequency with which a bid placed with a certain timestamp bin won the auction.
+    The function first calculates the start and end time for each auction.
+    Then, the function calculates the normalized time for each bid.
+    The function then finds the winning bid for each item.
+    Lastly, the function calculates the win percentage for each timestamp bin.
     """
     q4 = """
-    WITH BidsWithTimeBin AS (
-        SELECT bidId, itemId, 
-               CAST((julianday(bidTimestamp) - julianday(auctionStart)) / (julianday(auctionEnd) - julianday(auctionStart)) * 10 AS INTEGER) + 1 AS timestamp_bin
+    WITH AuctionTimes AS (
+        SELECT
+            itemId, MIN(bidTime) AS startTime, MAX(bidTime) AS endTime
         FROM bids
-        JOIN items ON bids.itemId = items.itemId
-    ), 
+        GROUP BY itemId
+    ),
+    BidsWithNormalizedTime AS (
+        SELECT
+            b.itemId, b.bidTime, b.bidAmount, t.startTime, t.endTime,
+            CASE
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.1 THEN 1
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.2 THEN 2
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.3 THEN 3
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.4 THEN 4
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.5 THEN 5
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.6 THEN 6
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.7 THEN 7
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.8 THEN 8
+                WHEN (julianday(t.endTime) - julianday(b.bidTime)) / (julianday(t.endTime) - julianday(t.startTime)) < 0.9 THEN 9
+                ELSE 10
+            END AS timestamp_bin
+        FROM bids b
+        JOIN AuctionTimes t ON b.itemId = t.itemId
+    ),
     WinningBids AS (
-        SELECT itemId, MAX(bidId) AS winning_bid
+        SELECT itemId, MAX(bidAmount) AS highestBidAmount
         FROM bids
         GROUP BY itemId
     )
-    SELECT timestamp_bin, COUNT(*) AS total_bids, SUM(CASE WHEN BidsWithTimeBin.bidId = WinningBids.winning_bid THEN 1 ELSE 0 END) AS winning_bids,
-           CAST(SUM(CASE WHEN BidsWithTimeBin.bidId = WinningBids.winning_bid THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) AS win_perc
-    FROM BidsWithTimeBin
-    LEFT JOIN WinningBids ON BidsWithTimeBin.itemId = WinningBids.itemId
-    GROUP BY timestamp_bin;
+    SELECT
+        n.timestamp_bin,
+        100.0 * SUM(CASE WHEN n.bidAmount = w.highestBidAmount THEN 1 ELSE 0 END) / COUNT(*) AS win_perc
+    FROM BidsWithNormalizedTime n
+    JOIN WinningBids w ON n.itemId = w.itemId
+    GROUP BY n.timestamp_bin
     """
     return print(auctions.query(q4))
